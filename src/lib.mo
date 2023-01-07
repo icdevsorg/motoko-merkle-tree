@@ -146,16 +146,16 @@ The root hash of a HashTree. This is the algorithm `reconstruct` described in
 https://sdk.dfinity.org/docs/interface-spec/index.html#_certificate
 */
 
-  public func withessHash(t : Witness) : Hash {
+  public func witnessHash(t : Witness) : Hash {
     switch (t) {
       case (#empty) {
         h("\11ic-hashtree-empty");
       };
       case (#fork(t1,t2)) {
-        h3("\10ic-hashtree-fork", withessHash(t1), withessHash(t2));
+        h3("\10ic-hashtree-fork", witnessHash(t1), witnessHash(t2));
       };
       case (#labeled(l,t)) {
-        h3("\13ic-hashtree-labeled", l, withessHash(t));
+        h3("\13ic-hashtree-labeled", l, witnessHash(t));
       };
       case (#leaf(v)) {
         h2("\10ic-hashtree-leaf", v)
