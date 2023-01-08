@@ -62,7 +62,11 @@ import Dyadic "dyadic";
 module {
 
   public type Key = Blob;
-  public type Value = Blob;
+
+  public type Value = {
+    #pre_hashed: Blob;
+    #content : Blob;
+  };
 
   /// This is the main type of this module: a possibly empty tree that maps
   /// `Key`s to `Value`s.
@@ -85,7 +89,7 @@ module {
       keyHash : Hash;
       prefix : [Nat8];
       hash : Hash; // simple memoization of the HashTree hash
-      value : Value;
+      value : Blob;
     };
   };
 
@@ -96,7 +100,7 @@ module {
     #pruned : Hash;
     #fork : (Witness, Witness);
     #labeled : (Key, Witness);
-    #leaf : Value;
+    #leaf : Blob;
   };
 
   public type Hash = Blob;
@@ -267,14 +271,17 @@ Base64 encoding.
 
   // Smart contructors (memoize the hashes and other data)
 
-  func hashValNode(v : Value) : Hash {
+  func hashValNode(v : Blob) : Hash {
     h2("\10ic-hashtree-leaf", v)
   };
 
   func mkLeaf(k : Key, v : Value) : T {
     let keyPrefix = hp(k);
     let keyHash = prefixToHash(keyPrefix);
-    let valueHash = h(v);
+    let valueHash = switch(v){
+      case(#content(v)){h(v)};
+      case(#pre_hashed(v)) {v};
+    };
 
     #leaf {
       key = k;
